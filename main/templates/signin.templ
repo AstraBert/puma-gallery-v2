@@ -1,0 +1,118 @@
+package templates
+
+templ SignIn() {
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Pumito Gallery - Sign In</title>
+        <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js"></script>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet"/>
+        <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Comic+Neue&display=swap" rel="stylesheet"/>
+        <style>
+            body {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+                background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+                font-family: 'Comic Neue', cursive, sans-serif;
+            }
+            .auth-container {
+                width: 100%;
+                max-width: 420px;
+                padding: 15px;
+            }
+            .auth-card {
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(10px);
+                border-radius: 24px;
+                box-shadow: 0 10px 40px rgba(252, 126, 76, 0.2);
+                padding: 40px;
+                border: 3px solid #fc7e4c;
+            }
+            .form-floating {
+                margin-bottom: 16px;
+            }
+            .form-control {
+                border: 2px solid #ffb09e;
+                border-radius: 12px;
+                background: #fff5e4;
+            }
+            .form-control:focus {
+                border-color: #fc7e4c;
+                box-shadow: 0 0 0 0.25rem rgba(252, 126, 76, 0.25);
+                background: white;
+            }
+            .form-floating label {
+                color: #673066;
+            }
+            .btn-primary {
+                background: linear-gradient(90deg, #ffb09e, #f9c07d);
+                border: none;
+                font-weight: 700;
+                margin-top: 8px;
+                border-radius: 12px;
+                color: #673066;
+                font-family: 'Fredoka One', cursive, sans-serif;
+                letter-spacing: 0.5px;
+                transition: all 0.3s ease;
+            }
+            .btn-primary:hover {
+                background: linear-gradient(90deg, #fc7e4c, #ffb09e);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(252, 126, 76, 0.4);
+            }
+            .btn-primary:active {
+                transform: translateY(0);
+            }
+            .auth-footer {
+                text-align: center;
+                margin-top: 24px;
+                color: #673066;
+                font-size: 0.9rem;
+            }
+            .auth-footer a {
+                color: #fc7e4c;
+                text-decoration: none;
+                font-weight: 700;
+            }
+            .auth-footer a:hover {
+                text-decoration: underline;
+            }
+            h1 {
+                color: #fc7e4c;
+                font-weight: 700;
+                margin-bottom: 32px;
+                text-align: center;
+                font-family: 'Fredoka One', cursive, sans-serif;
+                letter-spacing: 1px;
+            }
+            .logo {
+                text-align: center;
+                font-size: 3rem;
+                margin-bottom: 16px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="auth-container">
+            <div class="auth-card">
+                <div class="logo">🐾</div>
+                <form hx-post="/login" hx-trigger="submit" hx-target="#successBanner">
+                    <h1 class="h3">Sign In to Pumito Gallery</h1>
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="username" name="username" placeholder="hello-world" required/>
+                        <label for="username">Username</label>
+                    </div>
+                    <div class="form-floating">
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Password" required/>
+                        <label for="password">Password</label>
+                    </div>
+                    <button class="btn btn-primary w-100 py-2" type="submit" id="signInButton">Sign in ✨</button>
+                </form>
+                <div id="successBanner"></div>
+            </div>
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    </body>
+}

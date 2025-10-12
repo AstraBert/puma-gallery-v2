@@ -1,0 +1,112 @@
+package templates
+
+templ UploadImages(authenticated bool) {
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Pumito Gallery - Upload Images</title>
+        <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    </head>
+        @NavBar(authenticated)
+        <div 
+		class="flex flex-col items-center justify-center min-h-screen p-4 w-full"
+		style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); font-family: 'Comic Neue', cursive, sans-serif;"
+        x-data="{ imageUrl: null, fileName: null }"
+	    >
+            <label for="image" class="text-center font-bold text-gray-700 text-2xl mb-6" style="font-family: 'Comic Neue', cursive, sans-serif;">Choose an image of our beloved Pumito:</label>
+            <form
+            hx-post="/pictures"
+            hx-target="#successBanner"
+            hx-trigger="submit"
+            hx-encoding="multipart/form-data"
+            enctype="multipart/form-data"
+            class="w-full flex flex-col items-center border-4 border-dashed rounded-xl p-8"
+            style="border-color: #ff9a8b; background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px);"
+            >
+            <div class="flex justify-center w-full mb-6">
+                <input
+                    type="file"
+                    id="image"
+                    name="image"
+                    accept="image/png, image/jpeg"
+                    required
+                    x-ref="inputImage"
+                    @change="
+                        const file = $event.target.files[0];
+                        if (file) {
+                            fileName = file.name;
+                            imageUrl = URL.createObjectURL(file);
+                        } else {
+                            fileName = null;
+                            imageUrl = null;
+                        }
+                    "
+                    class="hidden"
+                />
+                <button
+                    type="button"
+                    @click="$refs.inputImage.click()"
+                    class="rounded-lg shadow-xl w-48 h-24 text-white cursor-pointer flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:scale-105"
+                    style="background: linear-gradient(135deg, #ff9a8b 0%, #ff6a88 100%); font-family: 'Comic Neue', cursive, sans-serif;"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 3v12"/>
+                        <path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    </svg>
+                    <span class="text-sm font-semibold">Upload an Image</span>
+                </button>
+            </div>
+
+            <div x-show="fileName" x-text="'Selected: ' + fileName" class="text-sm text-gray-700 text-center mb-4 font-semibold" style="font-family: 'Comic Neue', cursive, sans-serif;"></div>
+
+            <div x-show="imageUrl" class="flex flex-col items-center justify-center gap-4">
+                <img
+                    :src="imageUrl"
+                    alt="Selected image preview"
+                    class="max-w-md max-h-64 object-contain border-4 rounded-lg shadow-lg"
+                    style="border-color: #ff9a8b;"
+                />
+
+                <fieldset class="fieldset w-full max-w-md">
+                    <legend class="fieldset-legend font-bold text-gray-700" style="font-family: 'Comic Neue', cursive, sans-serif;">Caption</legend>
+                    <input type="text" class="input w-full rounded-lg border-2 p-3 focus:outline-none focus:ring-2" placeholder="Pumito being a cat" id="caption" name="caption" style="border-color: #ff9a8b; font-family: 'Comic Neue', cursive, sans-serif; background: rgba(255, 255, 255, 0.8);" />
+                </fieldset>
+
+                <div class="flex gap-4">
+                    <button
+                        @click="
+                            imageUrl = null;
+                            fileName = null;
+                            $refs.inputImage.value = '';
+                            $refs.paletteDisplay.innerHTML = '';
+                        "
+                        type="button"
+                        class="px-6 py-3 text-white rounded-lg shadow-lg font-semibold transition-all duration-300 hover:scale-105"
+                        style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); font-family: 'Comic Neue', cursive, sans-serif;"
+                    >
+                        Clear Image
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="px-6 py-3 text-white rounded-lg shadow-lg font-semibold transition-all duration-300 hover:scale-105"
+                        hx-indicator="#loading"
+                        style="background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%); font-family: 'Comic Neue', cursive, sans-serif;"
+                    >
+                        Submit
+                    </button>
+                </div>
+
+                <div id="loading" class="htmx-indicator">
+                    <div class="animate-spin rounded-full h-6 w-6 border-b-2" style="border-color: #ff9a8b;"></div>
+                </div>
+            </div>
+        </form>
+        <div id="successBanner">
+        </div>
+    </div>
+}
