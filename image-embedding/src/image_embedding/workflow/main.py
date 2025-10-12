@@ -22,6 +22,7 @@ class EmbedImageWorkflow(Workflow):
         return OutputEvent(embeddings=embeddings, image_url=ev.image_url)
     
 async def run_workflow():
+    await asyncio.sleep(30)
     consumer = KafkaConsumer(
         'images',
         bootstrap_servers='kafka:9092',

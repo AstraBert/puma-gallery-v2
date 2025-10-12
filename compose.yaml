@@ -10,6 +10,8 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_SERVER_ID: 1
       ZOOKEEPER_SERVERS: zoo:2888:3888
+    networks:
+      - dokploy-network
 
   kafka:
     image: apache/kafka:latest
@@ -35,6 +37,8 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: "zoo:2181"
     depends_on:
       - zoo
+    networks:
+      - dokploy-network
 
   app:
     build: ./main/
@@ -48,6 +52,14 @@ services:
       SUPABASE_BUCKET_ID: $SUPABASE_BUCKET_ID
     depends_on:
       - kafka
+    networks:
+      - dokploy-network
+    expose:
+      - 8000
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.frontend-app.rule=Host(`compose.clelias-dockploy.my.id`)
+      - traefik.http.routers.frontend-app.entrypoints=web
   
   ingestion:
     build: ./ingestion/
@@ -59,11 +71,15 @@ services:
     depends_on:
       - kafka
       - image-embedding
+    networks:
+      - dokploy-network
   
   image-embedding:
     build: ./image-embedding/
-    depends_on:
-      - kafka
     environment:
       REPLICATE_API_TOKEN: $REPLICATE_API_TOKEN
+    depends_on:
+      - kafka
+    networks:
+      - dokploy-network
 
