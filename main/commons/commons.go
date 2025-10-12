@@ -112,3 +112,7 @@ type ImageToUpload struct {
 	FilePath string `json:"filePath"`
 	Url      string `json:"url"`
 }
+
+type KafkaImage struct {
+	Url string `json:"image_url"`
+}

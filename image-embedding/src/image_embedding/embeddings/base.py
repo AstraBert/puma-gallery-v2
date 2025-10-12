@@ -1,17 +1,13 @@
-from typing import TYPE_CHECKING
-from torch import device, no_grad
-from PIL import Image
-from io import BytesIO
-from transformers.models.auto import AutoImageProcessor, AutoModel
+import replicate
 
-DEVICE = device("cpu")
-PROCESSOR = AutoImageProcessor.from_pretrained(pretrained_model_name_or_path="./model/preprocessor_config.json")
-MODEL = AutoModel.from_pretrained(pretrained_model_name_or_path="./model/")
+from typing import cast
 
-def produce_embeddings(image_content: bytes) -> list[float]:
-    image = Image.open(BytesIO(image_content))
-    inputs = PROCESSOR(images=image, return_tensors="pt").to(DEVICE)
-    outputs = MODEL(**inputs)
-    with no_grad():
-        embeddings = outputs.last_hidden_state.mean(dim=1).cpu().numpy()
-    return embeddings.tolist()[0]
+async def produce_embeddings(image_url: str) -> list[float]:
+    prediction = await replicate.async_run(
+        "daanelson/imagebind:0383f62e173dc821ec52663ed22a076d9c970549c209666ac3db181618b7a304",
+        input={
+            "input": image_url,
+            "modality": "vision"
+        }
+    )
+    return cast(list[float], prediction)

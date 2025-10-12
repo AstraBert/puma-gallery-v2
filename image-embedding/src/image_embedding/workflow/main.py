@@ -1,18 +1,13 @@
 import asyncio
 import json
 
-from typing import Union, Optional
-from httpx import AsyncClient, HTTPError
+from typing import Optional
 from workflows import Workflow, step
-from workflows.events import StartEvent, StopEvent, Event
+from workflows.events import StartEvent, StopEvent
 from kafka import KafkaConsumer, KafkaProducer
 from image_embedding.embeddings import produce_embeddings
 
 class InputEvent(StartEvent):
-    image_url: str
-
-class DownloadedImageEvent(Event):
-    image_bytes: bytes
     image_url: str
 
 class OutputEvent(StopEvent):
@@ -22,19 +17,8 @@ class OutputEvent(StopEvent):
 
 class EmbedImageWorkflow(Workflow):
     @step
-    async def download_image_from_url(self, ev: InputEvent) -> Union[DownloadedImageEvent, OutputEvent]:
-        try:
-            async with AsyncClient() as client:
-                response = await client.get(ev.image_url)
-                response.raise_for_status()
-                content = response.content
-                return DownloadedImageEvent(image_bytes=content, image_url=ev.image_url)
-        except HTTPError as e:
-            return OutputEvent(error=f"An error occurred while downloading the image: {e}")
-
-    @step
-    async def embed_image(self, ev: DownloadedImageEvent) -> OutputEvent:
-        embeddings = produce_embeddings(image_content=ev.image_bytes)
+    async def embed_image(self, ev: InputEvent) -> OutputEvent:
+        embeddings = await produce_embeddings(image_url=ev.image_url)
         return OutputEvent(embeddings=embeddings, image_url=ev.image_url)
     
 async def run_workflow():
@@ -53,7 +37,7 @@ async def run_workflow():
         value_serializer=lambda v: json.dumps(v).encode('utf-8')
     )
     
-    wf = EmbedImageWorkflow(timeout=120)
+    wf = EmbedImageWorkflow(timeout=600)
     
     print("Starting to consume messages from 'images' topic...")
     

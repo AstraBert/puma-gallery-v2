@@ -56,7 +56,7 @@ async def run_workflow():
             
             for _, messages in message_batch.items():
                 for message in messages:
-                    print(f"Received message: {message.value}")
+                    print(f"Received message for image: {message.value.get('image_url')}")
                     try:
                         await wf.run(start_event=InputEvent(image_url=message.value.get("image_url", ""), image_embeddings=message.value.get("image_embeddings", [])))
                     except Exception as e:

@@ -13,6 +13,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"github.com/segmentio/kafka-go"
 	storage_go "github.com/supabase-community/storage-go"
 	"github.com/supabase-community/supabase-go"
 )
@@ -180,6 +181,29 @@ func PostPictures(c *fiber.Ctx) error {
 	if err != nil {
 		c.Set("Content-Type", "text/html")
 		return templates.SingupBanner(err).Render(c.Context(), c.Response().BodyWriter())
+	}
+	imageForKafka := commons.KafkaImage{Url: url.SignedURL}
+	byteData, err := json.Marshal(imageForKafka)
+	if err != nil {
+		banners := templates.SingupBanner(err)
+		return banners.Render(c.Context(), c.Response().BodyWriter())
+	}
+	conn, err := kafka.DialLeader(context.Background(), "tcp", "kafka:9092", "images", 0)
+	if err != nil {
+		banners := templates.SingupBanner(err)
+		return banners.Render(c.Context(), c.Response().BodyWriter())
+	}
+	conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+	_, err = conn.WriteMessages(
+		kafka.Message{Value: byteData},
+	)
+	if err != nil {
+		banners := templates.SingupBanner(err)
+		return banners.Render(c.Context(), c.Response().BodyWriter())
+	}
+	if err := conn.Close(); err != nil {
+		banners := templates.SingupBanner(err)
+		return banners.Render(c.Context(), c.Response().BodyWriter())
 	}
 	c.Set("Content-Type", "text/html")
 	return templates.SingupBanner(err).Render(c.Context(), c.Response().BodyWriter())
