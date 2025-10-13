@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+import base64
 
 from typing import Optional
 from workflows import Workflow, step
@@ -8,6 +9,7 @@ from workflows.events import StartEvent, StopEvent
 from kafka import KafkaConsumer
 from ingestion.vector_store import ImageUploader
 from ingestion.notify import send_discord_notification
+from ingestion.encryption import Encrypter
 
 class InputEvent(StartEvent):
     image_url: str
@@ -36,13 +38,14 @@ class EmbedImageWorkflow(Workflow):
 
 async def run_workflow():
     await asyncio.sleep(30)
+    enc = Encrypter()
     consumer = KafkaConsumer(
         'image-embeddings',
         bootstrap_servers='kafka:9092',
         auto_offset_reset='earliest',
         enable_auto_commit=True, 
         group_id='emebddings-consumer-0',
-        value_deserializer=lambda x: json.loads(x.decode('utf-8')),
+        value_deserializer=lambda x: json.loads((x).decode('utf-8')),
         consumer_timeout_ms=1000
     )
 
@@ -57,9 +60,14 @@ async def run_workflow():
             
             for _, messages in message_batch.items():
                 for message in messages:
-                    print(f"Received message for image: {message.value.get('image_url')}")
+                    print(f"Received message")
+                    aes_key = base64.b64decode(message.value.get("aes_key", ""))
+                    json_payload = base64.b64decode(message.value.get("json_payload", ""))
+                    deciphered_message = json.loads(enc.decrypt(aes_key, json_payload))
+                    if deciphered_message.get("api_key", "") != os.getenv("KAFKA_API_KEY", ""):
+                        continue
                     try:
-                        await wf.run(start_event=InputEvent(image_url=message.value.get("image_url", ""), image_embeddings=message.value.get("image_embeddings", [])))
+                        await wf.run(start_event=InputEvent(image_url=deciphered_message.get("image_url", ""), image_embeddings=deciphered_message.get("image_embeddings", [])))
                     except Exception as e:
                         print(f"Error processing message: {e}")
             

@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"database/sql"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"os"
@@ -182,8 +183,25 @@ func PostPictures(c *fiber.Ctx) error {
 		c.Set("Content-Type", "text/html")
 		return templates.SingupBanner(err).Render(c.Context(), c.Response().BodyWriter())
 	}
-	imageForKafka := commons.KafkaImage{Url: url.SignedURL}
+	imageForKafka := commons.KafkaImage{Url: url.SignedURL, ApiKey: os.Getenv("KAFKA_API_KEY")}
 	byteData, err := json.Marshal(imageForKafka)
+	if err != nil {
+		banners := templates.SingupBanner(err)
+		return banners.Render(c.Context(), c.Response().BodyWriter())
+	}
+	encData, encKey, err := commons.EncryptDataAes(byteData)
+	if err != nil {
+		banners := templates.SingupBanner(err)
+		return banners.Render(c.Context(), c.Response().BodyWriter())
+	}
+	dataToSend := commons.KafkaData{JsonPayload: encData, AesKey: encKey}
+	kafkaBody, err := json.Marshal(dataToSend)
+	if err != nil {
+		banners := templates.SingupBanner(err)
+		return banners.Render(c.Context(), c.Response().BodyWriter())
+	}
+	kafkaSend := commons.KafkaSend{Value: base64.StdEncoding.EncodeToString(kafkaBody)}
+	kafkaSendBody, err := json.Marshal(kafkaSend)
 	if err != nil {
 		banners := templates.SingupBanner(err)
 		return banners.Render(c.Context(), c.Response().BodyWriter())
@@ -195,7 +213,7 @@ func PostPictures(c *fiber.Ctx) error {
 	}
 	conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
 	_, err = conn.WriteMessages(
-		kafka.Message{Value: byteData},
+		kafka.Message{Value: kafkaSendBody},
 	)
 	if err != nil {
 		banners := templates.SingupBanner(err)

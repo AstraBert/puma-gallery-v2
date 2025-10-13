@@ -1,3 +1,5 @@
 .python-version
 .env
 .venv
+*.pem
+test-go/
