@@ -6,9 +6,13 @@ from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP, AES
 from Crypto.Hash import SHA256
 
+def load_private_key_from_env():
+    b64_enc = os.getenv("E2E_PRIVATE_KEY", "")
+    return base64.b64decode(b64_enc).decode("utf-8")
+
 class Encrypter:
     def __init__(self) -> None:
-        self._private_key = RSA.import_key(os.getenv("E2E_PRIVATE_KEY", ""))
+        self._private_key = RSA.import_key(load_private_key_from_env())
         self._public_key = self._private_key.public_key()
         
     def decrypt(self, message: dict) -> bytes:

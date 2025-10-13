@@ -14,7 +14,6 @@ import (
 	"io"
 	"os"
 	"puma-gallery/db"
-	"strings"
 
 	"context"
 	"database/sql"
@@ -137,9 +136,13 @@ type KafkaSend struct {
 	Value string `json:"value"`
 }
 
-func LoadEncryptionKeyFromEnv() string {
-	key := os.Getenv("E2E_PUBLIC_KEY")
-	return strings.ReplaceAll(key, "\\n", "\n")
+func LoadEncryptionKeyFromEnv() (string, error) {
+	b64_enc := os.Getenv("E2E_PUBLIC_KEY")
+	key, err := base64.StdEncoding.DecodeString(b64_enc)
+	if err != nil {
+		return "", err
+	}
+	return string(key), nil
 }
 
 func StringKeyToRsaKey(key string) (*rsa.PublicKey, error) {
@@ -199,7 +202,11 @@ func EncryptDataAes(data []byte) ([]byte, []byte, error) {
 
 	encryptedData := gcm.Seal(nil, nonce, data, nil)
 	encryptedDataWithNonce := append(nonce, encryptedData...)
-	rsaKey, err := StringKeyToRsaKey(LoadEncryptionKeyFromEnv())
+	strKey, err := LoadEncryptionKeyFromEnv()
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to load RSA key from env: %w", err)
+	}
+	rsaKey, err := StringKeyToRsaKey(strKey)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to get RSA key: %w", err)
 	}
