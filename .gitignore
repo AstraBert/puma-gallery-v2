@@ -1,3 +1,8 @@
 .python-version
 .env
 .venv
+*.pem
+test-go/
+main/commons/users.db
+.*_cache/
+__pycache__/

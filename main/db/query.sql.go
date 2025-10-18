@@ -41,8 +41,8 @@ func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
 }
 
 const getUserBySessionToken = `-- name: GetUserBySessionToken :one
-SELECT id, username, hashed_password, session_token, csrf_token, created_at, updated_at FROM users 
-WHERE session_token = ? 
+SELECT id, username, hashed_password, session_token, csrf_token, created_at, updated_at FROM users
+WHERE session_token = ?
 LIMIT 1
 `
 

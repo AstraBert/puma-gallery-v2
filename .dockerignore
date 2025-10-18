@@ -1,0 +1,4 @@
+.python-version
+.env
+.venv/
+*.pem
