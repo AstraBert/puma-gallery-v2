@@ -19,6 +19,6 @@ DELETE FROM users
 WHERE username = ?;
 
 -- name: GetUserBySessionToken :one
-SELECT * FROM users 
-WHERE session_token = ? 
+SELECT * FROM users
+WHERE session_token = ?
 LIMIT 1;

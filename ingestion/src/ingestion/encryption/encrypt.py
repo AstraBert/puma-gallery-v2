@@ -5,15 +5,17 @@ from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP, AES
 from Crypto.Hash import SHA256
 
-def load_private_key_from_env():
+
+def load_private_key_from_env() -> str:
     b64_enc = os.getenv("E2E_PRIVATE_KEY", "")
     return base64.b64decode(b64_enc).decode("utf-8")
 
-class Encrypter:
+
+class Decrypter:
     def __init__(self) -> None:
         self._private_key = RSA.import_key(load_private_key_from_env())
         self._public_key = self._private_key.public_key()
-        
+
     def decrypt(self, aes_key: bytes, data: bytes) -> bytes:
         cipher_rsa = PKCS1_OAEP.new(self._private_key, hashAlgo=SHA256)
         key = cipher_rsa.decrypt(aes_key)
@@ -23,6 +25,5 @@ class Encrypter:
 
         cipher_aes = AES.new(key, mode=AES.MODE_GCM, nonce=nonce)
         return cipher_aes.decrypt_and_verify(
-            ciphertext_and_tag[:-16],
-            ciphertext_and_tag[-16:]
+            ciphertext_and_tag[:-16], ciphertext_and_tag[-16:]
         )

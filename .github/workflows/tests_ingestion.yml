@@ -1,0 +1,22 @@
+name: CI Tests - Ingestion
+
+on:
+  pull_request:
+
+jobs:
+  testing-ingestion:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Set up Python
+        run: uv python install
+
+      - name: Run Tests
+        working-directory: ingestion
+        run: uv run -- pytest tests/

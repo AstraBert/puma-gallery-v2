@@ -1,3 +1,3 @@
-from .encrypt import Encrypter
+from .encrypt import Decrypter
 
-__all__ = ["Encrypter"]
+__all__ = ["Decrypter"]

@@ -2,6 +2,13 @@
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[dependency-groups]
+dev = [
+  "pytest>=8.4.2",
+  "pytest-asyncio>=1.2.0",
+  "python-dotenv>=1.1.1"
+]
+
 [project]
 name = "image-embedding"
 version = "0.1.0"
@@ -9,11 +16,14 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "kafka-python>=2.2.15",
-    "llama-index-workflows>=2.8.0",
-    "pycryptodome>=3.23.0",
-    "replicate>=1.0.7",
+  "kafka-python>=2.2.15",
+  "llama-index-workflows>=2.8.0",
+  "pycryptodome>=3.23.0",
+  "replicate>=1.0.7"
 ]
+
+[project.scripts]
+embed-images = "image_embedding.workflow.main:main"
 
 [tool.hatch.build.targets.wheel]
 only-include = ["src/image_embedding"]
@@ -21,5 +31,10 @@ only-include = ["src/image_embedding"]
 [tool.hatch.build.targets.wheel.sources]
 "src" = ""
 
-[project.scripts]
-embed-images = "image_embedding.workflow.main:main"
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+addopts = [
+  "-s",
+  "-v",
+  "--tb=short"
+]

@@ -65,7 +65,7 @@ services:
     depends_on:
       - kafka
       - image-embedding
-  
+
   image-embedding:
     build: ./image-embedding/
     environment:
@@ -74,4 +74,3 @@ services:
       E2E_PRIVATE_KEY: $E2E_PRIVATE_KEY
     depends_on:
       - kafka
-

@@ -25,7 +25,7 @@ templ MainPage(images []commons.ImageData, authenticated bool) {
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     </head>
     @NavBar(authenticated)
-	<div 
+	<div
 		class="flex flex-col items-center justify-center min-h-screen p-4"
 		style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); font-family: 'Comic Neue', cursive, sans-serif;"
 	>
@@ -37,7 +37,7 @@ templ MainPage(images []commons.ImageData, authenticated bool) {
 			<div class="w-full max-w-5xl mx-auto">
 				<!-- Header -->
 				<div class="text-center mb-8">
-					<h1 
+					<h1
 						class="text-5xl md:text-6xl font-bold mb-4 tracking-wider"
 						style="font-family: 'Comic Neue', cursive, sans-serif; color: #fc7e4c; letter-spacing: 2px;"
 					>
@@ -61,17 +61,17 @@ templ MainPage(images []commons.ImageData, authenticated bool) {
 												alt={ image.Caption }
 												class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
 											/>
-											
+
 											<!-- Playful hover overlay -->
 											<div class="absolute inset-0 bg-gradient-to-t from-orange-400/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-3xl"></div>
-											
+
 											<!-- Caption card -->
 											<div class="absolute bottom-3 left-2 right-2 transform">
-												<div 
+												<div
 													class="rounded-2xl p-3 shadow-lg"
 													style="background: #fff5e4;"
 												>
-													<p 
+													<p
 														class="text-sm font-bold leading-tight mb-1"
 														style="font-family: 'Comic Neue', cursive, sans-serif; color: #4f3852;"
 													>
@@ -92,10 +92,10 @@ templ MainPage(images []commons.ImageData, authenticated bool) {
 					<!-- Navigation buttons -->
 					<div class="flex justify-center gap-2 py-4">
 						for i, image := range images {
-							<a 
+							<a
 								href={ templ.SafeURL(fmt.Sprintf("#slide%d", image.Id)) }
 								class="btn btn-xs"
-								style={ fmt.Sprintf("background: linear-gradient(90deg, #ffb09e, #f9c07d); color: #673066; %s", 
+								style={ fmt.Sprintf("background: linear-gradient(90deg, #ffb09e, #f9c07d); color: #673066; %s",
 									func() string {
 										if i == 0 { return "opacity: 100;" }
 										return ""
@@ -108,11 +108,11 @@ templ MainPage(images []commons.ImageData, authenticated bool) {
 
 					<!-- Image counter -->
 					<div class="text-center mt-6">
-						<div 
+						<div
 							class="inline-block px-4 py-2 rounded-full shadow-md"
 							style="background: linear-gradient(90deg, #ffb09e, #f9c07d); color: #673066;"
 						>
-							<p 
+							<p
 								class="text-sm font-bold"
 								style="font-family: 'Comic Neue', cursive, sans-serif;"
 							>
