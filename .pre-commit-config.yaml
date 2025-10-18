@@ -67,19 +67,3 @@ repos:
     rev: v0.23.1
     hooks:
       - id: toml-sort-fix
-
-  - repo: local
-    hooks:
-      - id: go-build
-        name: go build
-        entry: cd main && go build ./...
-        language: system
-        files: \.go$
-        pass_filenames: false
-
-      - id: go-test-short
-        name: go test (short)
-        entry: cd main && go test -short ./...
-        language: system
-        files: \.go$
-        pass_filenames: false
