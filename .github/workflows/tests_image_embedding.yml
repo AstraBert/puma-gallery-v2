@@ -19,4 +19,7 @@ jobs:
 
       - name: Run Tests
         working-directory: image-embedding
-        run: uv run -- pytest tests/
+        run: |
+          uv sync
+          source .venv/bin/activate
+          pytest tests/
